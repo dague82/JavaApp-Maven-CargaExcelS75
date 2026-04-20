@@ -1,0 +1,122 @@
+-- Análisis Detallado de Problemas de Formato por Entidad
+USE [S75-Test];
+GO
+
+-- 1. RESUMEN: Entidades con problemas críticos (campos obligatorios NULL)
+SELECT
+    SUS_ENTIDAD as 'Entidad',
+    COUNT(*) as 'Total Registros',
+    SUM(CASE WHEN SUS_TIPOSUS IS NULL OR SUS_TIPOSUS = '' THEN 1 ELSE 0 END) as 'Tipo Sus NULL',
+    SUM(CASE WHEN SUS_FECALTA IS NULL THEN 1 ELSE 0 END) as 'Fecha Alta NULL',
+    SUM(CASE WHEN SUS_DNI IS NULL OR SUS_DNI = '' THEN 1 ELSE 0 END) as 'DNI NULL',
+    SUM(CASE WHEN SUS_NOMBRE IS NULL OR SUS_NOMBRE = '' THEN 1 ELSE 0 END) as 'Nombre NULL',
+    SUM(CASE WHEN SUS_NUMPST IS NULL OR SUS_NUMPST = 0 THEN 1 ELSE 0 END) as 'Num Puesto 0',
+    MAX(SUS_ID) as 'Max ID'
+FROM S75SUSTITUCIONES_CARGA_2
+GROUP BY SUS_ENTIDAD
+HAVING
+    SUM(CASE WHEN SUS_TIPOSUS IS NULL OR SUS_TIPOSUS = '' THEN 1 ELSE 0 END) > 0
+    OR SUM(CASE WHEN SUS_FECALTA IS NULL THEN 1 ELSE 0 END) > 0
+ORDER BY 'Tipo Sus NULL' DESC, 'Fecha Alta NULL' DESC;
+
+GO
+
+-- 2. DETALLES: REZIKLETA - Registros con problemas (IDs 8062-8121)
+SELECT
+    SUS_ID,
+    SUS_ENTIDAD,
+    SUS_TIPOSUS as 'Tipo Sus (NULO)',
+    SUS_FECALTA as 'Fecha Alta (NULA)',
+    SUS_DNI as 'DNI Sustituto (tiene dato)',
+    SUS_NOMBRE as 'Nombre (tiene dato)',
+    SUS_DNI_SUSTITUIDO as 'DNI Sustituido (¿COLUMNA DESPLAZADA?)',
+    SUS_NUMPST as 'Num Puesto'
+FROM S75SUSTITUCIONES_CARGA_2
+WHERE SUS_ENTIDAD = 'REZIKLETA'
+  AND SUS_ID BETWEEN 8062 AND 8121
+ORDER BY SUS_ID
+OFFSET 0 ROWS FETCH FIRST 10 ROWS ONLY;
+
+GO
+
+-- 3. DETALLES: Entidades con Tipo Sustitución NULL (completo)
+SELECT
+    SUS_ENTIDAD,
+    MIN(SUS_ID) as 'ID Inicio',
+    MAX(SUS_ID) as 'ID Fin',
+    COUNT(*) as 'Total Registros Afectados',
+    STRING_AGG(CAST(SUS_ID AS VARCHAR(10)), ', ') as 'IDs Afectados'
+FROM S75SUSTITUCIONES_CARGA_2
+WHERE SUS_TIPOSUS IS NULL OR SUS_TIPOSUS = ''
+GROUP BY SUS_ENTIDAD
+ORDER BY COUNT(*) DESC;
+
+GO
+
+-- 4. DETALLES: Entidades con Fecha Alta NULL
+SELECT
+    SUS_ENTIDAD,
+    MIN(SUS_ID) as 'ID Inicio',
+    MAX(SUS_ID) as 'ID Fin',
+    COUNT(*) as 'Total Registros Afectados'
+FROM S75SUSTITUCIONES_CARGA_2
+WHERE SUS_FECALTA IS NULL
+GROUP BY SUS_ENTIDAD
+ORDER BY COUNT(*) DESC;
+
+GO
+
+-- 5. INFORMACIÓN: Columna Num Puesto - Validar si es problema global
+SELECT
+    'Num Puesto = 0' as 'Análisis',
+    COUNT(*) as 'Total Registros',
+    COUNT(DISTINCT SUS_ENTIDAD) as 'Entidades Afectadas'
+FROM S75SUSTITUCIONES_CARGA_2
+WHERE SUS_NUMPST = 0 OR SUS_NUMPST IS NULL;
+
+GO
+
+-- 6. COMPARATIVA: Una muestra de datos correctos vs problemáticos
+SELECT TOP 5
+    SUS_ID,
+    SUS_ENTIDAD,
+    SUS_TIPOSUS,
+    SUS_FECALTA,
+    SUS_NUMPST,
+    SUS_DNI,
+    SUS_NOMBRE
+FROM S75SUSTITUCIONES_CARGA_2
+WHERE SUS_TIPOSUS IS NOT NULL AND SUS_TIPOSUS != ''
+  AND SUS_FECALTA IS NOT NULL
+ORDER BY SUS_ID;
+
+GO
+
+-- 7. MUESTREO: Primeros registros de REZIKLETA y otra entidad con datos correctos
+SELECT
+    'REZIKLETA (Problemática)' as 'Hoja',
+    TOP(5)
+    SUS_ID,
+    SUS_TIPOSUS,
+    SUS_FECALTA,
+    SUS_NUMPST,
+    SUS_DNI,
+    SUS_NOMBRE
+FROM S75SUSTITUCIONES_CARGA_2
+WHERE SUS_ENTIDAD = 'REZIKLETA'
+ORDER BY SUS_ID;
+
+GO
+
+SELECT
+    'BADIA BERRI (Correcta)' as 'Hoja',
+    TOP(5)
+    SUS_ID,
+    SUS_TIPOSUS,
+    SUS_FECALTA,
+    SUS_NUMPST,
+    SUS_DNI,
+    SUS_NOMBRE
+FROM S75SUSTITUCIONES_CARGA_2
+WHERE SUS_ENTIDAD = 'BADIA BERRI'
+ORDER BY SUS_ID;

@@ -1,0 +1,59 @@
+-- Script para crear tabla S75SUSTITUCIONES_CARGA_2 en SQL Server
+-- Base de datos: S75-Test
+-- Servidor: INGDGC
+
+USE [S75-Test];
+GO
+
+-- Crear tabla si no existe
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[S75SUSTITUCIONES_CARGA_2]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1)
+BEGIN
+    CREATE TABLE [dbo].[S75SUSTITUCIONES_CARGA_2] (
+        [SUS_ID] INT PRIMARY KEY IDENTITY(1,1),
+        [NUM_EXP] VARCHAR(20) NULL,
+        [SUS_TIPOSUS] VARCHAR(50) NULL,
+        [SUS_NUMPST] INT NULL,
+        [SUS_TIPOID] VARCHAR(10) NULL,
+        [SUS_DNI] VARCHAR(20) NULL,
+        [SUS_NOMBRE] VARCHAR(255) NULL,
+        [SUS_APE1] VARCHAR(255) NULL,
+        [SUS_APE2] VARCHAR(255) NULL,
+        [SUS_SEXO] VARCHAR(10) NULL,
+        [SUS_JORNADA] FLOAT NULL,
+        [SUS_ENTIDAD] VARCHAR(255) NULL,
+        [SUS_TIPOENT] INT NULL,
+        [SUS_TIPOCONT] INT NULL,
+        [SUS_FECALTA] DATE NULL,
+        [SUS_FECBAJA] DATE NULL,
+        [SUS_FORMACION] VARCHAR(255) NULL,
+        [SUS_COSTE] FLOAT NULL,
+        [SUS_CONCURRENCIA] VARCHAR(100) NULL,
+        [SUS_MOTVARIACION] VARCHAR(255) NULL,
+        [SUS_DNI_SUSTITUIDO] VARCHAR(20) NULL,
+        [SUS_OBSERVACIONES] VARCHAR(MAX) NULL
+    );
+
+    PRINT 'Tabla S75SUSTITUCIONES_CARGA_2 creada exitosamente.';
+END
+ELSE
+BEGIN
+    PRINT 'La tabla S75SUSTITUCIONES_CARGA_2 ya existe.';
+END
+GO
+
+-- Crear secuencia para generar IDs (equivalente a Oracle SEQUENCE)
+IF NOT EXISTS (SELECT * FROM sys.sequences WHERE name = 'SEQ_S75SUSTITUCIONES')
+BEGIN
+    CREATE SEQUENCE [dbo].[SEQ_S75SUSTITUCIONES]
+        START WITH 1
+        INCREMENT BY 1;
+    PRINT 'Secuencia SEQ_S75SUSTITUCIONES creada.';
+END
+ELSE
+BEGIN
+    PRINT 'La secuencia SEQ_S75SUSTITUCIONES ya existe.';
+END
+GO
+
+-- Ver estructura de la tabla
+EXEC sp_help 'S75SUSTITUCIONES_CARGA_2';

@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "all",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"✓ Verificando conexión a BD DES (172.16.64.16:1530)...\\nEntorno: DES\\nHost: 172.16.64.16:1530\\nSID: LBDR.BATERA.LANBIDE.EUS\\nUsuario: flbpru (DES/0)\\n---\\nNota: Asegúrate de que dataBase.properties esté actualizado con las credenciales correctas.\"}'",
+            "statusMessage": "Verificando conexión a BD DES",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+- [BD Credentials Configuration](bd_credentials.md) — Oracle DES env (172.16.64.16:1530), users flbpru/flb
