@@ -195,7 +195,7 @@ This project is part of the Lanbide digitalization initiative.
 
 ## 👤 Author
 
-DavidG (Diego Guerrero)
+DavidG (David Guerrero)
 - Email: dguerrero@dgsofteng.com
 
 ## 📚 Documentation Files
